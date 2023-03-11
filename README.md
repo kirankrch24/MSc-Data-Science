@@ -1,2 +1,2 @@
 # MSc-Data-Science
-This repo sole purpose is to add projects in my modules.
+This repo sole purpose is to add projects ofmy modules.
