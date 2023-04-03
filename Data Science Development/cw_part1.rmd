@@ -1,6 +1,144 @@
 
 
+
+
+
 ```{r}
+library(dplyr)
+library(magrittr)
+```
+
+```{r}
+
+# loading the file 
+
 escape <- read.csv('escapes.csv')
 ```
+
+
+```{r}
+# Dimensions o dataframes 
+
+dim(escape)
+```
+
+
+the dataset contains of 357 records and 38 features . Now we take a look on summary
+
+```{r}
+# summary of the dataset
+summary(escape)
+```
+I don't find summary very intresting now explore each feature 
+
+
+now we look at the structure of data
+```{r}
+str(escape)
+```
+we can see most of the feature type is character
+
+#Operator at the time of escape
+
+we look at "Operator at the time of escape"
+
+```{r}
+levels((escape$Operator.at.Time.of.Escape))
+```
+it is showing null 
+
+let's check it contains factor levels
+
+```{r}
+is.factor(escape$Operator.at.Time.of.Escape)
+```
+
+It means that columns is not a factor and does not have levels
+
+```{r}
+escape$Operator.at.Time.of.Escape <- as.factor(escape$Operator.at.Time.of.Escape)
+levels(escape$Operator.at.Time.of.Escape)
+```
+
+it contain 79 different types of operator at the time of escapes
+
+now let we check null value in this column 
+```{r}
+sum(is.na(escape$Operator.at.Time.of.Escape))
+
+
+```
+
+As it contains zero null values means this column is clean
+
+#Escape Water Type
+
+as this column in character data type,  first we need to convert it into factors then check levels and null values 
+
+```{r}
+escape$Escape.Water.Type <- as.factor(escape$Escape.Water.Type)
+escape$Escape.Water.Type
+levels(escape$Escape.Water.Type)
+sum(is.na(escape$Escape.Water.Type))
+```
+
+as it contain only three type of values and it does not have any null value we can say that this column is also clean 
+
+#Escape Start Date
+
+as this column in character data type,  first we need to convert it into factors then check levels and null values
+
+```{r}
+escape$Escape.Start.Date <- as.POSIXct(escape$Escape.Start.Date, format="%d-%b-%y", tz="UTC")
+escape$Escape.Start.Date
+
+```
+```{r}
+sum(is.na(escape$Escape.Water.Type))
+```
+
+
+also in this column we don't find any null values and all the date convert to appropriate data type
+
+#Escape Start Time 
+```{r}
+escape$Escape.Start.Time 
+```
+
+
+as we can see there are several values which does not state time 
+
+```{r}
+escape$Escape.Start.Time <- as.factor(escape$Escape.Start.Time)
+escape$Escape.Start.Time
+print('------')
+levels(escape$Escape.Start.Time)
+```
+```{r}
+#escape$Escape.Start.Time <- factor(c("04:00-0","10:00 am","10:00am","1000","11","11:00 am","1200","12pm","13","1430","17:00hr","1700","18","2pm","700","8.3","8.45","800","900"))
+
+#levels(escape$Escape.Start.Time)[levels(escape$Escape.Start.Time) == "04:00-0"] <- "04:00"
+
+escape <- escape %>% mutate(Escape.Start.Time = recode(Escape.Start.Time, "04:00-0" = "04:00", "10:00 am" = "10:00", "10:00am"= "10:00", "1000" = "10:00","11"="11:00", "11:00 am"="11:00","1200"="12:00","12pm"="12:00","13"="13:00","1430"="14:30","17:00hr"="17:00", "1700"="17:00","18"="18:00","2pm" = "14:00","700" = "07:00","8.3"="08:30","8.45"="08:45", "800"="08:00","900"="09:00"))
+print("----")
+levels(escape$Escape.Start.Time)
+```
+
+```{r}
+escape <- escape %>% mutate(Escape.Start.Time = recode(Escape.Start.Time,"early h"= "NA","not kno" = "NA", "not pro" = "NA", "overnig"="NA", "pm"="NA","unknown"="NA", "n/a" = "NA"))
+
+levels(escape$Escape.Start.Time)
+```
+we converted all the required values to appropriate values an
+
+
+#Esca
+
+
+
+
+
+
+
+
 
