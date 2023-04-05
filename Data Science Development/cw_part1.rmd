@@ -1,59 +1,76 @@
+---
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
 
+# Data Science Development
 
+# Data Cleaning
 
-
+loading required library for this project
 
 ```{r}
 library(dplyr)
 library(magrittr)
+library(ggplot2)
 ```
 
+loading the file in escape variable as dataframe
+
 ```{r}
-
 # loading the file 
-
 escape <- read.csv('escapes.csv')
 ```
 
+Checking the dimensions
 
 ```{r}
 # Dimensions o dataframes 
-
 dim(escape)
 ```
 
-
-the dataset contains of 357 records and 38 features . Now we take a look on summary
+the dataset contains of 357 records and 38 features .
+Now we take a look on summary
 
 ```{r}
 # summary of the dataset
 summary(escape)
 ```
-I don't find summary very intresting now explore each feature 
 
+I don't find summary very interesting now explore each feature and broadly figure out which are irrelevant and then delete it as well
 
-now we look at the structure of data
-```{r}
-str(escape)
-```
-we can see most of the feature type is character
-
-#Operator at the time of escape
-
-we look at "Operator at the time of escape"
+## Removing Unneccesay Columns
 
 ```{r}
-levels((escape$Operator.at.Time.of.Escape))
+
+escape$Aquaculture.Type <- NULL
+escape$Escape.End.Time <- NULL
+escape$Final.Date.of.Escape <-NULL
+escape$Water.Type <- NULL
+escape$Site.Address.1 <- NULL
+escape$Site.Address.2 <- NULL
+escape$Site.Address.3 <- NULL
+escape$Escape.Grid.Reference <- NULL
+escape$National.Grid.Reference <- NULL
+escape$Initial.Number.Escaped <- NULL
+escape$Final.Escape.Reason <- NULL
+escape$Region <- NULL
+escape$Operator <- NULL
+escape$Initial.Date.of.Escape <- NULL
+escape$Site.Contact.Number <- NULL
+escape$Easting <-NULL
+escape$Northing <- NULL
+
+
+
 ```
-it is showing null 
 
-let's check it contains factor levels
+take one column at a time clean and transform it accordingly
 
-```{r}
-is.factor(escape$Operator.at.Time.of.Escape)
-```
+Operator at the time of escape
 
-It means that columns is not a factor and does not have levels
+as we can see from evinronment this column is in character type, covert it into factor so that column is ready for lraning
 
 ```{r}
 escape$Operator.at.Time.of.Escape <- as.factor(escape$Operator.at.Time.of.Escape)
@@ -62,7 +79,8 @@ levels(escape$Operator.at.Time.of.Escape)
 
 it contain 79 different types of operator at the time of escapes
 
-now let we check null value in this column 
+now let we check null value in this column
+
 ```{r}
 sum(is.na(escape$Operator.at.Time.of.Escape))
 
@@ -71,9 +89,9 @@ sum(is.na(escape$Operator.at.Time.of.Escape))
 
 As it contains zero null values means this column is clean
 
-#Escape Water Type
+Escape Water Type
 
-as this column in character data type,  first we need to convert it into factors then check levels and null values 
+as this column in character data type, first we need to convert it into factors then check levels and null values
 
 ```{r}
 escape$Escape.Water.Type <- as.factor(escape$Escape.Water.Type)
@@ -82,31 +100,31 @@ levels(escape$Escape.Water.Type)
 sum(is.na(escape$Escape.Water.Type))
 ```
 
-as it contain only three type of values and it does not have any null value we can say that this column is also clean 
+as it contain only three type of values and it does not have any null value we can say that this column is also clean
 
-#Escape Start Date
+##Escape Start Date
 
-as this column in character data type,  first we need to convert it into factors then check levels and null values
+as this column in character data type, first we need to convert it into factors then check levels and null values
 
 ```{r}
 escape$Escape.Start.Date <- as.POSIXct(escape$Escape.Start.Date, format="%d-%b-%y", tz="UTC")
 escape$Escape.Start.Date
 
 ```
+
 ```{r}
 sum(is.na(escape$Escape.Water.Type))
 ```
 
+also in this column we don't find any null values and all the date convert to appropriate data type.
 
-also in this column we don't find any null values and all the date convert to appropriate data type
+##Escape Start Time
 
-#Escape Start Time 
 ```{r}
 escape$Escape.Start.Time 
 ```
 
-
-as we can see there are several values which does not state time 
+as we can see there are several values which does not state time
 
 ```{r}
 escape$Escape.Start.Time <- as.factor(escape$Escape.Start.Time)
@@ -114,10 +132,9 @@ escape$Escape.Start.Time
 print('------')
 levels(escape$Escape.Start.Time)
 ```
-```{r}
-#escape$Escape.Start.Time <- factor(c("04:00-0","10:00 am","10:00am","1000","11","11:00 am","1200","12pm","13","1430","17:00hr","1700","18","2pm","700","8.3","8.45","800","900"))
 
-#levels(escape$Escape.Start.Time)[levels(escape$Escape.Start.Time) == "04:00-0"] <- "04:00"
+```{r}
+#In Escape.start.time, at some places data entered is not in correct form. So we corrected data by assigning right values 
 
 escape <- escape %>% mutate(Escape.Start.Time = recode(Escape.Start.Time, "04:00-0" = "04:00", "10:00 am" = "10:00", "10:00am"= "10:00", "1000" = "10:00","11"="11:00", "11:00 am"="11:00","1200"="12:00","12pm"="12:00","13"="13:00","1430"="14:30","17:00hr"="17:00", "1700"="17:00","18"="18:00","2pm" = "14:00","700" = "07:00","8.3"="08:30","8.45"="08:45", "800"="08:00","900"="09:00"))
 print("----")
@@ -129,16 +146,510 @@ escape <- escape %>% mutate(Escape.Start.Time = recode(Escape.Start.Time,"early 
 
 levels(escape$Escape.Start.Time)
 ```
+
 we converted all the required values to appropriate values an
 
+Escape Species
 
-#Esca
+```{r}
+# Convert the Escaped.Species column to a factor
+escape$Escaped.Species <- as.factor(escape$Escaped.Species)
+
+# Check the levels of the factor variable
+levels(escape$Escaped.Species)
+```
+
+Stage
+
+```{r}
+escape$Stage <- as.factor(escape$Stage)
+levels(escape$Stage)
+```
+
+## Age
+
+```{r}
+
+clean_age <- function(age) {
+  
+  # Convert the age string to lowercase to ensure consistent pattern matching
+  age <- tolower(age)
+  
+  
+  # Check if the age contains years (e.g., "2 yrs", "2 yrs sw")
+  if (grepl("\\d+\\s*yrs?", age)) {
+    
+    # Extract the numeric part and multiply by 12 to convert years to months
+    age <- as.numeric(gsub("[^0-9.]", "", age)) * 12
+  } 
+  else {
+    
+    # Check if the age contains a range (e.g., "7-8 months")
+    if (grepl("(\\d+)-(\\d+)\\s*months?", age)) {
+      
+      # Remove non-numeric and non-hyphen characters, split by hyphen, and convert to numeric
+      nums <- as.numeric(unlist(strsplit(gsub("[^0-9-]", "", age), "-")))
+      # Calculate the mean of the range and store it as the age
+      age <- mean(nums)
+      
+    } 
+    else {
+      # Remove any text following numbers (e.g., "9 months i" -> "9")
+      age <- gsub("(\\d+)\\D+", "\\1", age)
+      
+      # Replace "s" values with 6 (e.g., "2001 s1", "2000 s1/2" -> "6")
+      age <- gsub("\\d+\\s*s[0-9]+(/\\d+)?", "6", age)
+      
+      # Replace any remaining non-numeric characters with NA (null value)
+      age <- gsub("[^0-9.]+", NA, age)
+      
+      # Convert the age string to a numeric value
+      age <- as.numeric(age)
+    }
+  }
+  
+  # Return the cleaned age value
+  return(age)
+}
+
+# Apply the function to the Age column
+escape$Age <- sapply(escape$Age, clean_age)
+
+
+escape$Age[284]<- 36
+escape$Age[218]<- 16.5
+escape$Age[76] <- NA
+escape$Age[93] <- NA
+escape$Age[128] <- NA
+escape$Age[150] <- NA
+escape$Age[339] <- NA
+
+
+# Replace values greater than 99 with NA
+escape$Age[escape$Age > 99] <- NA
+
+# Calculate the average of the non-NA values
+avg_age <- mean(escape$Age, na.rm = TRUE)
+
+# Impute the average to the NA values
+escape$Age[is.na(escape$Age)] <- avg_age
+
+# Print the updated escape$Age
+escape$Age <- round(escape$Age)
+
+print(escape$Age)
 
 
 
+```
+
+```{r}
+escape$Age[76]
+# Print the cleaned Age column
+
+```
+
+## Average Weight
+
+```{r}
+clean_weight <- function(weight) {
+  
+  # Convert the weight string to lowercase to ensure consistent pattern matching
+  weight <- tolower(weight)
+  
+  # Check if the weight contains kilograms (e.g., "1.0 kg", "4.5 kg")
+  if (grepl("\\d+(\\.\\d+)?\\s*kg", weight)) {
+    
+    # Remove non-numeric characters, convert to numeric, and multiply by 1000 to convert kg to g
+    weight <- as.numeric(gsub("[^0-9.]", "", weight)) * 1000
+    
+  } else {
+    
+    # Check if the weight contains a range (e.g., "1.8-2.0 kg", "350 - 400 g")
+    if (grepl("(\\d+(\\.\\d+)?)-(\\d+(\\.\\d+)?\\s*(kg|g))", weight)) {
+      
+      # Remove non-numeric and non-hyphen characters, split by hyphen, and convert to numeric
+      nums <- as.numeric(unlist(strsplit(gsub("[^0-9.-]", "", weight), "-")))
+      
+      # Check if the range is in kg, and if so, multiply by 1000 to convert to g
+      if (grepl("kg", weight)) {
+        nums <- nums * 1000
+      }
+      
+      # Calculate the mid-point of the range and store it as the weight
+      weight <- (nums[1] + nums[2]) / 2
+    } 
+    
+    else {
+      # Remove any text following numbers (e.g., "199g", "60 g" -> "199", "60")
+      weight <- gsub("(\\d+(\\.\\d+)?)\\D+", "\\1", weight)
+      
+      # Replace any remaining non-numeric characters with NA (null value)
+      weight <- gsub("[^0-9.]+", NA, weight)
+      
+      # Convert the weight string to a numeric value
+      weight <- as.numeric(weight)
+    }
+  }
+  
+  # Return the cleaned weight value
+  return(weight)
+}
+
+# Apply the function to the Average.Weight column
+escape$Average.Weight <- sapply(escape$Average.Weight, clean_weight)
+
+escape$Average.Weight[10] <- 1900
+escape$Average.Weight[49] <- 1825
+escape$Average.Weight[54] <- NA
+escape$Average.Weight[65] <- NA
+escape$Average.Weight[66] <- NA
+escape$Average.Weight[76] <- NA
+escape$Average.Weight[87] <- NA
+escape$Average.Weight[182] <- NA
+escape$Average.Weight[247] <- NA
+escape$Average.Weight[262] <- NA
+escape$Average.Weight[75] <- 1650 
+escape$Average.Weight[84] <- 3000
+escape$Average.Weight[94] <- 4500
+escape$Average.Weight[122] <- 1000.125
+escape$Average.Weight[166] <- 60
+escape$Average.Weight[185] <- 9000
+escape$Average.Weight[204] <- 453.60
+escape$Average.Weight[229] <- 4500
+escape$Average.Weight[245] <- 3200
+escape$Average.Weight[284] <- 18500
+
+# Calculate the average of the non-NA values
+avg_wgh <- mean(escape$Average.Weight, na.rm = TRUE)
+
+# Impute the average to the NA values
+escape$Average.Weight[is.na(escape$Average.Weight)] <- avg_wgh
 
 
 
+# Print the cleaned Average.Weight column in grams
+escape$Average.Weight <- round(escape$Average.Weight)
+
+escape$Average.Weight
+
+
+```
+
+Initial Escape Reason
+
+```{r}
+escape$Initial.Escape.Reason <- as.factor(escape$Initial.Escape.Reason)
+levels(escape$Initial.Escape.Reason)
+```
+
+Final number Escaped
+
+```{r}
+escape$Final.Number.Escaped
+```
+
+```{r}
+# Function to extract numbers from a string
+extract_numbers <- function(x) {
+  nums <- as.numeric(gsub("[^0-9]", "", x))
+  if (length(nums) == 0) {
+    return(NA)
+  }
+  return(nums)
+}
+
+escape$Final.Number.Escaped[81] <- 150
+escape$Final.Number.Escaped[204] <- 150
+escape$Final.Number.Escaped[206] <- 6500
+escape$Final.Number.Escaped[220] <- 775
+escape$Final.Number.Escaped[230] <- 35
+escape$Final.Number.Escaped[331] <- 75000
+escape$Final.Number.Escaped[343] <- 7500
+
+# Apply the extract_numbers function to the escape$Final.Number.Escaped column
+escape$Final.Number.Escaped <- sapply(escape$Final.Number.Escaped, extract_numbers)
+
+# Replace NA values with 0
+escape$Final.Number.Escaped <- replace(escape$Final.Number.Escaped, is.na(escape$Final.Number.Escaped), 0)
+
+
+# Check the cleaned values
+print(escape$Final.Number.Escaped)
+```
+
+Final number recovered
+
+```{r}
+
+# apply extract number funcation to get number
+escape$Final.Number.Recovered <- sapply(escape$Final.Number.Recovered, extract_numbers)
+
+# assigned appropriate values accordingly by manually cheking
+escape$Final.Number.Recovered[142]<- NA
+escape$Final.Number.Recovered[216]<- 90
+escape$Final.Number.Recovered[250]<- 90
+escape$Final.Number.Recovered[287]<- 4869
+escape$Final.Number.Recovered[301]<- 90
+
+# Replace NA values with 0
+escape$Final.Number.Recovered <- replace(escape$Final.Number.Recovered, is.na(escape$Final.Number.Recovered), 0)
+
+
+# Check the cleaned values
+print(escape$Final.Number.Recovered)
+```
+
+## Total number of Escaped
+
+new column is created from escape$Final.Number.Escaped - escape$Final.Number.Recovered
+
+```{r}
+escape$Total.number.escaped <- escape$Final.Number.Escaped - escape$Final.Number.Recovered
+escape$Total.number.escaped[escape$Total.number.escaped < 0] <- 0
+escape$Total.number.escaped
+
+
+```
+
+## changing data type for learning
+
+```{r}
+# as the data in this column is cleaned now converting data for learning
+
+# Marine Scotland ID
+escape$Marine.Scotland.Site.ID <- as.factor(escape$Marine.Scotland.Site.ID)
+
+
+escape$Date.Registered <- as.POSIXct(escape$Date.Registered, format="%d-%b-%y", tz="UTC")
+
+
+escape$Site.Name <- as.factor(escape$Site.Name)
+
+escape$Local.Authority <- as.factor(escape$Local.Authority)
+levels(escape$Local.Authority)
+
+escape$Producing.in.Last.3.Years <- as.factor(escape$Producing.in.Last.3.Years)
+levels(escape$Producing.in.Last.3.Years)
+
+escape$Site.Post.Code <- as.factor(escape$Site.Post.Code)
+
+escape$Health.Surveillance <- as.factor(escape$Health.Surveillance)
+levels(escape$Health.Surveillance)
+
+escape$MS.Management.Area <- as.factor(escape$MS.Management.Area)
+levels(escape$MS.Management.Area)
+
+escape$Species <- as.factor(escape$Species)
+levels(escape$Species)
+```
+
+```{r}
+summary(escape)
+```
+
+## Exporting cleaned data in csv file
+
+```{r}
+write.csv(escape, file = "cleaned_data.csv", row.names = FALSE)
+```
+
+# EDA
+
+## No of fishes escaped under Operator:
+
+```{r}
+# aggregating data by operator
+escaped_by_operator <- aggregate(escape$Total.number.escaped, by = list(Operator = escape$Operator.at.Time.of.Escape), sum)
+
+# creating new df to store information
+colnames(escaped_by_operator) <- c("Operator", "Total_Escaped_Fishes")
+
+# sorting in desc order 
+escaped_by_operator <- escaped_by_operator[order(-escaped_by_operator$Total_Escaped_Fishes),]
+
+# printing output
+print(head(escaped_by_operator,10))
+
+```
+
+-   The operator with the highest number of escaped fishes is Abbey St. Bathans Trout Farm, with 7,080,000 escaped fishes.
+-   Marine Harvest (Scotland) Ltd follows as the second-highest, with 345,042 escaped fishes.
+-   Lakeland Unst Seawater ranks third, with 344,685 escaped fishes.
+-   Orkney Sea Farms Ltd comes in fourth, with 282,500 escaped fishes.
+-   Cro Lax Ltd. is fifth, with 254,420 escaped fishes.
+
+It is important to note that there is a significant difference between the number of escaped fishes for the top operator (Abbey St. Bathans Trout Farm) and the subsequent operators.
+This may suggest that the top operator experienced one or more major escape incidents compared to the others.
+
+It's also worth noting that the number of escaped fishes for some operators is relatively low or even zero.
+This could indicate that these operators have effective escape prevention measures in place, or they haven't experienced any significant escape incidents.
+However, it is also possible that the data may not be complete or up to date for these operators.
+
+## What are the average Age of the fishes which escaped
+
+```{r}
+# calulating the average age of the fish
+average_age <- mean(escape$Age, na.rm = TRUE)
+
+# ploting visual distributions
+hist(escape$Age, main="Age Distribution of Escaped Fishes", xlab="Age is in Months", ylab="Fish Counts", col="lightblue", border="black", breaks = 60)
+
+#printing Average Age
+print(average_age)
+
+
+```
+
+The average age of the fishes that escaped is approximately 14.88 months.
+This means that, on average, fishes that escaped from the facilities were around 14.88 months old.
+
+Based on the histogram above, we can make the following observations:
+
+-   The majority of escaped fishes are around 10 to 20 months old, as this age range appears to have the highest frequency in the histogram.
+-   There is a right-skewed distribution of the escaped fishes' ages, meaning that there are more young fishes escaping compared to older ones. This can be seen from the long tail on the right side of the histogram, with a few escaped fishes being over 40 months old.
+-   The distribution also shows that there are few escaped fishes that are less than 10 months old, possibly indicating better containment measures for younger fishes or that they are less likely to escape.
+
+Overall, the histogram reveals that most escaped fishes are between 10 and 20 months old, with a decreasing frequency of escape events as the age of the fishes increases.
+
+## What are the average Weight of the fishes which escaped
+
+```{r}
+average_weight <- mean(escape$Average.Weight, na.rm = TRUE)
+
+
+library(ggplot2)
+
+ggplot(escape, aes(x = Average.Weight)) +
+  geom_histogram(binwidth = 500) +
+  scale_x_continuous(limits = c(0, 10000), expand = c(0, 0)) +
+  labs(title = "Histogram of Average Weight of Escaped Fishes", x = "Average Weight (grams)", y = "Frequency") +
+  theme_minimal()
+
+average_weight
+
+```
+
+The average weight of escaped fishes is approximately 3,172.255 grams.
+
+Based on the histogram above, we can make the following observations:
+
+-   The distribution of the average weight of escaped fishes is positively skewed, with a majority of the fishes having a relatively low average weight.
+
+-   Most of the escaped fishes have an average weight ranging between 0 and 2,500 grams.
+
+-   As the average weight increases, the frequency of escaped fishes decreases significantly.
+
+-   The number of fishes with an average weight between 7,500 and 10,000 grams is very low compared to those with lower weights.
+
+-   This suggests that the majority of escaped fishes are smaller, possibly indicating that smaller fishes may be more prone to escaping, or that there may be more opportunities for them to do so.
+
+## How does the escape water type affect the number of escapes
+
+```{r}
+# Count the number of escapes per water type
+total_escapes <- aggregate(x = escape$Escape.ID, by = list(Escape.Water.Type = escape$Escape.Water.Type), FUN = length)
+
+# Rename the new column to "Total_Escapes"
+colnames(total_escapes)[2] <- "Total_Escapes"
+
+# Sort the dataframe by "Total_Escapes" in descending order
+total_escapes <- total_escapes[order(-total_escapes$Total_Escapes),]
+
+
+# plot in bar chart
+ggplot(total_escapes, aes(x = Escape.Water.Type, y = Total_Escapes, fill = Escape.Water.Type)) +
+  geom_col() +
+  geom_text(aes(label = Total_Escapes), vjust = -0.5) +
+  labs(x = "Escape Water Type", y = "Total Escapes", fill = "Escape Water Type") +
+  ggtitle("Total Escapes by Water Type")
+
+```
+
+s' stands for seawater, 'f' for freshwater, and 'b' for brackish water.
+
+Based on the results:
+
+-   Seawater escapes (271 incidents) are the most common, accounting for the majority of escape incidents in the dataset.
+-   Freshwater escapes (85 incidents) are less frequent but still contribute a significant number of escape incidents.
+-   Brackish water escapes (1 incident) are very rare, with only a single recorded incident in the dataset.
+
+This suggests that escape incidents are more likely to occur in seawater environments, followed by freshwater environments, and the least likely in brackish water environments.
+
+This is Just A basic EDA performed(answered the basic questions from the data)
+
+## Which species are more likely to escape?
+
+```{r}
+
+# Group the escape data frame by Escaped.Species and summarize the total number of escapes
+species_counts <- escape %>%
+  group_by(Escaped.Species) %>%
+  #count the number of row in each column
+  summarize(Total_Escapes = n()) %>%
+  arrange(desc(Total_Escapes))
+
+
+# Plot the species counts as a bar chart with number counts on top of each bar
+ggplot(species_counts, aes(x = Escaped.Species, y = Total_Escapes)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Total_Escapes), vjust = -0.5) + # add number counts on top of each bar
+  xlab("Escaped Species") +
+  ylab("Total Escapes") +
+  ggtitle("Total Escapes by Species") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 
 
+```
+## Are there any correlations between health surveillance levels and the number of escapes?
+
+```{r}
+# Group the escape data frame by Health Surveillance level and summarize the total number of escapes
+health_counts <- aggregate(Escape.ID ~ Health.Surveillance, data = escape, FUN = length)
+
+# Sort the health surveillance counts in descending order
+health_counts <- health_counts[order(health_counts$Escape.ID, decreasing = TRUE), ]
+
+# Create a bar chart of the total escapes for each Health Surveillance level with count values on top of each bar
+barplot(health_counts$Escape.ID, names.arg = health_counts$Health.Surveillance, 
+        xlab = "Health Surveillance Level", ylab = "Total Escapes",
+        main = "Total Escapes by Health Surveillance Level", 
+        las = 2, cex.axis = 0.8, ylim = c(0, max(health_counts$Escape.ID) * 1.1))
+
+# Add count values on top of each bar
+text(x = 1:length(health_counts$Health.Surveillance), 
+     y = health_counts$Escape.ID, 
+     labels = health_counts$Escape.ID, 
+     pos = 3, cex = 0.8)
+
+
+```
+
+
+# Mering Two DataSet
+
+I cleaned one dataset which named "cleaned_data.csv", which i will merge with "analysis.csv" on Site.Name
+
+```{r}
+# Load the analysis.csv file into R
+analysis <- read.csv("analysis.csv", header = TRUE)
+
+# Convert the Site.Name column of the analysis data frame to lowercase
+analysis$Site.Name <- tolower(analysis$Site.Name)
+
+# Merge the escape and analysis data frames based on the Site.Name column
+merged_data <- merge(escape, analysis, by = "Site.Name")
+
+
+
+# Export the merged_data data frame as a CSV file called "escapesPlus.csv"
+write.csv(merged_data, "escapesPlus.csv", row.names = FALSE)
+
+# Confirm that the file was created
+file.exists("escapesPlus.csv")
+```
+
+
+As I merged the cleaned_data with analysis to create new dataset "escapePlus", which later can be used for learning purposes.
+# The End
