@@ -40,7 +40,7 @@ summary(escape)
 
 I don't find summary very interesting now explore each feature and broadly figure out which are irrelevant and then delete it as well
 
-## Removing Unneccesay Columns
+## Removing Unnecessary Columns
 
 ```{r}
 
@@ -70,7 +70,7 @@ take one column at a time clean and transform it accordingly
 
 Operator at the time of escape
 
-as we can see from evinronment this column is in character type, covert it into factor so that column is ready for lraning
+as we can see from environment this column is in character type, covert it into factor so that column is ready for learning
 
 ```{r}
 escape$Operator.at.Time.of.Escape <- as.factor(escape$Operator.at.Time.of.Escape)
@@ -602,6 +602,16 @@ ggplot(species_counts, aes(x = Escaped.Species, y = Total_Escapes)) +
 
 
 ```
+
+Based on the provided information from the bar graph, we can infer the following:
+
+-   Atlantic Salmon appears to be the most challenging fish species to contain, as it has the highest number of escape incidents (277 occurrences).
+
+-   Rainbow Trout, with 74 escape incidents, also presents a notable challenge in containment compared to other fish species on the graph.
+
+-   The significantly lower number of escape incidents for the remaining fish species suggests that these species might be easier to manage and contain in comparison to Atlantic Salmon and Rainbow Trout.
+    Alternatively, it could be that these species are less common in containment facilities, which would also result in fewer escape incidents.
+
 ## Are there any correlations between health surveillance levels and the number of escapes?
 
 ```{r}
@@ -626,6 +636,20 @@ text(x = 1:length(health_counts$Health.Surveillance),
 
 ```
 
+Based on the bar graph provided, we can infer the following:
+
+-   There is a strong correlation between the level of health surveillance and the number of escapes.
+    As the level of health surveillance increases, the number of escapes decreases.
+
+-   A medium level of health surveillance seems to be the most common situation, as it accounts for the highest number of escapes (187 times).
+    This may suggest that in most cases, health surveillance efforts are not prioritized as much as they could be.
+
+-   Low-level health surveillance is still more effective than having no surveillance at all, as it results in fewer escapes than the medium level (118 times).
+
+-   High-level health surveillance is the most effective at minimizing escapes, with only 36 instances occurring.
+    This suggests that investing in more robust health surveillance measures could be an effective strategy for reducing the number of escapes and improving overall security.
+
+In conclusion, the graph demonstrates the importance of implementing higher levels of health surveillance in order to minimize the number of escapes.
 
 # Mering Two DataSet
 
@@ -649,7 +673,6 @@ write.csv(merged_data, "escapesPlus.csv", row.names = FALSE)
 # Confirm that the file was created
 file.exists("escapesPlus.csv")
 ```
-
 
 As I merged the cleaned_data with analysis to create new dataset "escapePlus", which later can be used for learning purposes.
 # The End
